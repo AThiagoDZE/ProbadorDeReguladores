@@ -1,0 +1,259 @@
+#:kivy 2.2.0
+
+<CircularLabel@Label>:
+    background_color: 0, 0, 1, 1
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [(5, 5), (5, 5), (5, 5), (5, 5)] # Define radii for each corner
+
+
+
+<ControlPanel>:
+    orientation: 'horizontal'
+    padding: 10
+    spacing: 10
+
+    canvas.before:
+        Color:
+            rgba: (220/255, 230/255, 255/255, 1) # Un azul pálido
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+    # Left Panel: Controls + Console
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.7
+
+        canvas.before:
+            # Color semitransparente para el efecto de vidrio esmerilado
+            Color:
+                rgba: (1, 1, 1, 0.4)
+            # Rectángulo con esquinas muy redondeadas
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [dp(25),]
+
+        # Automatic Control Panel (with background)
+        GridLayout:
+            id: control_grid
+            cols: 2
+            padding: 15
+            spacing: 12
+            size_hint_y: None
+            height: self.minimum_height
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.05, 0.05, 0.8
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10,]
+
+            Label:
+                text: '[b]Automatic Control Panel[/b]'
+                markup: True
+                size_hint_y: None
+                height: 35
+                halign: 'center'
+            
+            Button:
+                id: btn_conectar
+                text: 'Connect'
+                size_hint_y: None
+                height: 45
+                on_press: root.connect()
+                background_color: (1, 1, 0, 1) if root.indicators['Connected'] else (0, 0.7, 0, 1)
+
+
+            # Button:
+            #     text: 'Automatic Test'
+            #     size_hint_y: None
+            #     height: 52
+            #     on_press: root.run_equipment_test()
+            #     background_color: (0, 0.7, 0, 1) if self.state == 'normal' else (0.7, 0, 0, 1)
+ 
+            # GridLayout:
+            #     id: manual_use
+            #     rows: 2
+            #     padding: 2
+            #     spacing: 2
+            #     size_hint_y: None
+            #     height: self.minimum_height
+                
+
+            Button:
+                text: 'Regulador Paralelo'
+                size_hint_y: None
+                height: 52
+                on_press: root.run_shunt_test()
+                background_color: (0, 0.7, 0, 1) if self.state == 'normal' else (0.7, 0, 0, 1)
+                    
+
+            Button:
+                text: 'Regulator Serie'
+                size_hint_y: None
+                height: 52 
+                on_press: root.run_serie_test()
+                background_color: (0, 0.7, 0, 1) if self.state == 'normal' else (0.7, 0, 0, 1)
+
+
+            Label:
+                text: 'RPM / Frequency:'
+                size_hint_y: None
+                height: 30
+            Slider:
+                min: 0
+                max: 10000
+                value: 1000
+                on_value: root.on_rpm_change(self.value)
+
+            Label:
+                text: 'Test Mode:'
+                size_hint_y: None
+                height: 30
+            Label:
+                text: root.mode_text
+                size_hint_y: None
+                height: 30
+                color: 0, 0, 0, 1
+
+            Label:
+                text: 'Test Current (A):'
+                size_hint_y: None
+                height: 30
+            Slider:
+                min: 0
+                max: 100
+                value: 10
+                on_value: root.on_current_change(self.value)
+
+            Label:
+                text: 'Test Voltage (V):'
+                size_hint_y: None
+                height: 30
+            Slider:
+                min: 0
+                max: 500
+                value: 120
+                on_value: root.on_voltage_change(self.value)
+
+            Label:
+                id: comTxRx
+                text: 'COM:'
+                size_hint_y: None
+                height: 30
+
+        # Console
+        TextInput:
+            id: console
+            text: ''
+            readonly: True
+            font_size: 12
+            foreground_color: 0, 0, 0, 1
+            background_color: 0.96, 0.96, 0.96, 1
+            size_hint_y: 0.5
+
+    # Right Panel: Status Indicators
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.3
+        padding: 10
+        spacing: 12
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Label:
+                text: 'Overcurrent Protection'
+            Label:
+                text: '●'
+                font_size: 50
+                color: (1, 0, 0, 1) if root.indicators['Overcurrent Protection'] else (0.3, 0.3, 0.3, 1)
+
+
+
+        Label:
+            id: tension_salida
+            text: '[b]Tension Salida[/b]'
+            font_size: 45
+            markup: True
+            size_hint_y: None
+            height: 35
+            halign: 'center'
+            foreground_color: 0, 0, 0, 1
+            background_color: 0.96, 0.96, 0.96, 1
+
+        Label:
+            text: '[b]Status Indicators[/b]'
+            markup: True
+            size_hint_y: None
+            height: 35
+            halign: 'center'
+
+        CircularLabel:
+            text: "STATUS"
+            font_size: 20
+            size_hint: None, None
+            size: 200, 30  # Make it square for a perfect circle
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            background_color: (1, 0, 0, 1) if root.indicators['Overvoltage'] else (0.3, 0.3, 0.3, 1)
+            
+
+        # Indicator rows
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Label:
+                text: 'Overvoltage'
+            Label:
+                text: '●'
+                font_size: 50
+                color: (1, 0, 0, 1) if root.indicators['Running'] else (0.3, 0.3, 0.3, 1)
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Label:
+                text: 'Overtemperature'
+            Label:
+                text: '●'
+                font_size: 50
+                color: (1, 0, 0, 1) if root.indicators['Overtemperature'] else (0.3, 0.3, 0.3, 1)
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Label:
+                text: 'Error'
+            Label:
+                text: '●'
+                font_size: 50
+                color: (1, 0, 0, 1) if root.indicators['Error'] else (0.3, 0.3, 0.3, 1)
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+            Label:
+                text: 'Overcurrent Protection'
+            Label:
+                text: '●'
+                font_size: 50
+                color: (1, 0, 0, 1) if root.indicators['Overcurrent Protection'] else (0.3, 0.3, 0.3, 1)
+
+        Button:
+            text: 'Reset Error'
+            size_hint_y: None
+            height: 50
+            on_press: root.reset_error()

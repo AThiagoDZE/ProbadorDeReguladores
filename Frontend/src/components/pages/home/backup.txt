@@ -1,0 +1,43 @@
+import React, { useState } from "react";
+import RadialGauge from "../../tools/RadialGauge";
+
+export default function Home() {
+    const [voltage, setVoltage] = useState(12.5);
+    const minVoltage = 12.5;
+    const maxVoltage = 16.5;
+
+    return (
+        <main className="flex flex-col items-center justify-center min-h-screen bg-slate-800 gap-8">
+            Voltímetro
+            <div className="w-100">
+                <RadialGauge
+                    value={voltage}
+                    unit={"V"}
+                    min={minVoltage}
+                    max={maxVoltage}
+                    ranges={[
+                        { min: 12.5, max: 14.1, color: "#f87171" }, // rojo
+                        { min: 14.1, max: 14.35, color: "#facc15" }, // amarillo
+                        { min: 14.35, max: 14.55, color: "#22c55e" }, // verde
+                        { min: 14.55, max: 14.7, color: "#facc15" }, // amarillo
+                        { min: 14.7, max: 16.5, color: "#f87171" }, // rojo
+                    ]}
+                />
+            </div>
+
+            {/* Slider */}
+            <div className="flex flex-col items-center text-white w-64">
+                <label className="mb-2">Voltaje: {voltage.toFixed(2)} V</label>
+                <input
+                    type="range"
+                    min={minVoltage}
+                    max={maxVoltage}
+                    step={0.1}
+                    value={voltage}
+                    onChange={(e) => setVoltage(parseFloat(e.target.value))}
+                    className="w-full accent-green-500"
+                />
+            </div>
+        </main>
+    );
+}
