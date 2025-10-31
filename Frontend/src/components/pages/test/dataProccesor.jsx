@@ -44,8 +44,11 @@ export default function DataProcessor({ resultado, onValidated }) {
                 });
                 res.validatedState = "undervoltage";
             }
-
-            else if (okCount1 === 1 && phaseOpenCount1 === 2) {
+            else if (
+                okCount1 === 1 &&
+                phaseOpenCount1 === 2 &&
+                ["IaRMS", "IbRMS", "IcRMS"].some(k => res.corrientes_2[k] > 1000)
+            ) {
                 const phaseMap = { dispA: "IaRMS", dispB: "IbRMS", dispC: "IcRMS" };
                 Object.entries(res.state_corrientes_1).forEach(([disp, state]) => {
                     const keyRMS = phaseMap[disp];
@@ -55,6 +58,7 @@ export default function DataProcessor({ resultado, onValidated }) {
                 res.Vout = 0;
                 res.validatedState = "overcurrent";
             }
+
             else if (
                 res.Vout > 0 && res.Vout < 9 &&
                 ["IaRMS", "IbRMS", "IcRMS"].every(k =>
